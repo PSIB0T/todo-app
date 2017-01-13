@@ -1,56 +1,26 @@
-const mongoose = require('mongoose');
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/TodoApp');
-var todoModel = mongoose.model('todoModel', {
-  text : {
-    type : String,
-    required: true,
-    minlength: 3,
-    trim: true
-  },
-  completed : {
-    type : Boolean,
-    default: false
-  },
-  completedAt : {
-    type : Number,
-    default: null
-  }
-});
-// var newTodo = new todoModel({
-//   text : 'Eat Dinner',
-//   completed : false
-// });
-// newTodo.save().then((doc) => {
-//   console.log('Saved document', doc);
-// }, (err) => {
-//   console.log('Unable to add new todo document to database');
-// });
+const express = require('express');
+const bodyParser = require('body-parser');
 
-// newTodo = new todoModel({
-//   text: '  Hello mongoose  '
-// });
+var {mongoose} = require('./db/mongoose');
+var {Todo} = require('./models/todo');
+var {User} = require('./models/user');
 
-// newTodo.save().then((doc) => {
-//   console.log('Saved document\n', doc);
-// }, (err) => {
-//   console.log('Unable to add new todo document to database', err);
-// });
+var app = express();
 
-var user = mongoose.model('User', {
-  email: {
-    type: String,
-    trim: true,
-    minlength: 1
-  }
+app.use(bodyParser.json());
+
+app.post('/todos', (req, res) => {
+    var todo = new Todo({
+      text: req.body.text
+    });
+
+    todo.save().then((doc) => {
+      res.send(doc);
+    }, (e) => {
+      res.status(400).send(e);
+    });
 });
 
-newTodo = new user({
-  email: '  hello@gmail.com  '
+app.listen(3000, ()=> {
+  console.log('Started on port 3000');
 })
-
-newTodo.save().then((doc) => {
-  console.log('Saved document\n', doc);
-}, (err) => {
-  console.log('Unable to add new todo document to database', err);
-});
